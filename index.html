@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secret Santa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body style="font-family:Arial; text-align:center; padding:40px">
+
+  <h2>🎅 Secret Santa</h2>
+
+  <input
+    id="psno"
+    placeholder="Enter PS No"
+    style="padding:10px; width:220px"
+  />
+  <br><br>
+
+  <button
+    onclick="draw()"
+    style="padding:10px 25px; font-size:16px"
+  >
+    Draw My Chit
+  </button>
+
+  <h3 id="result" style="margin-top:30px;"></h3>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwWdDAzqPgR3Qv4OdjsbKgURvmqzQEZqtEykldajQjkd-Uzl3Y_1HY_peHeSLfqINWw/exec";
+
+function draw() {
+  const psno = document.getElementById("psno").value.trim();
+  if (!psno) {
+    alert("Please enter PS No");
+    return;
+  }
+
+  let device = localStorage.getItem("device_id");
+  if (!device) {
+    device = "DEV-" + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem("device_id", device);
+  }
+
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      psno: psno,
+      device: device
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+    } else {
+      document.getElementById("result").innerText =
+        "🎁 You got: " + data.success;
+    }
+  })
+  .catch(() => {
+    alert("Unable to connect. Try again.");
+  });
+}
+</script>
+
+</body>
+</html>
